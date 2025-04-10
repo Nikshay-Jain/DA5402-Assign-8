@@ -1,0 +1,32 @@
+2025-04-10 16:10:19,339 - INFO - Preparing data...
+2025-04-10 16:10:21,422 - INFO - Load dataset info from C:\Users\niksh\tensorflow_datasets\emnist\letters\3.1.0
+2025-04-10 16:10:21,441 - INFO - Creating a tf.data.Dataset reading 1 files located in folders: C:\Users\niksh\tensorflow_datasets\emnist\letters\3.1.0.
+2025-04-10 16:10:21,797 - INFO - Constructing tf.data.Dataset emnist for split train, from C:\Users\niksh\tensorflow_datasets\emnist\letters\3.1.0
+2025-04-10 16:10:22,035 - INFO - Building model...
+2025-04-10 16:10:23,989 - WARNING - From C:\Users\niksh\Desktop\DA5402-Assign-8\venv\Lib\site-packages\keras\src\backend\tensorflow\core.py:219: The name tf.placeholder is deprecated. Please use tf.compat.v1.placeholder instead.
+
+2025-04-10 16:10:23,995 - ERROR - Training failed: Exception encountered when calling Lambda.call().
+
+[1mWe could not automatically infer the shape of the Lambda's output. Please specify the `output_shape` argument for this Lambda layer.[0m
+
+Arguments received by Lambda.call():
+  • args=(['<KerasTensor shape=(None, None), dtype=int64, sparse=False, ragged=False, name=label>', '<KerasTensor shape=(None, 25, 27), dtype=float32, sparse=False, ragged=False, name=keras_tensor_6>', '<KerasTensor shape=(None, 1), dtype=int64, sparse=False, ragged=False, name=input_length>', '<KerasTensor shape=(None, 1), dtype=int64, sparse=False, ragged=False, name=label_length>'],)
+  • kwargs={'mask': ['None', 'None', 'None', 'None']}
+Traceback (most recent call last):
+  File "C:\Users\niksh\Desktop\DA5402-Assign-8\src\train.py", line 34, in train_model
+    model = build_model()
+            ^^^^^^^^^^^^^
+  File "C:\Users\niksh\Desktop\DA5402-Assign-8\src\utils.py", line 57, in build_model
+    loss_out = layers.Lambda(lambda args: K.ctc_batch_cost(*args), name='ctc')(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\niksh\Desktop\DA5402-Assign-8\venv\Lib\site-packages\keras\src\utils\traceback_utils.py", line 122, in error_handler
+    raise e.with_traceback(filtered_tb) from None
+  File "C:\Users\niksh\Desktop\DA5402-Assign-8\venv\Lib\site-packages\keras\src\layers\core\lambda_layer.py", line 95, in compute_output_shape
+    raise NotImplementedError(
+NotImplementedError: Exception encountered when calling Lambda.call().
+
+[1mWe could not automatically infer the shape of the Lambda's output. Please specify the `output_shape` argument for this Lambda layer.[0m
+
+Arguments received by Lambda.call():
+  • args=(['<KerasTensor shape=(None, None), dtype=int64, sparse=False, ragged=False, name=label>', '<KerasTensor shape=(None, 25, 27), dtype=float32, sparse=False, ragged=False, name=keras_tensor_6>', '<KerasTensor shape=(None, 1), dtype=int64, sparse=False, ragged=False, name=input_length>', '<KerasTensor shape=(None, 1), dtype=int64, sparse=False, ragged=False, name=label_length>'],)
+  • kwargs={'mask': ['None', 'None', 'None', 'None']}

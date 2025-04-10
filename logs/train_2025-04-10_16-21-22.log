@@ -1,0 +1,31 @@
+2025-04-10 16:21:22,860 - INFO - Preparing data...
+2025-04-10 16:21:24,465 - INFO - Load dataset info from C:\Users\niksh\tensorflow_datasets\emnist\letters\3.1.0
+2025-04-10 16:21:24,472 - INFO - Creating a tf.data.Dataset reading 1 files located in folders: C:\Users\niksh\tensorflow_datasets\emnist\letters\3.1.0.
+2025-04-10 16:21:24,709 - INFO - Constructing tf.data.Dataset emnist for split train, from C:\Users\niksh\tensorflow_datasets\emnist\letters\3.1.0
+2025-04-10 16:21:25,160 - INFO - Building model...
+2025-04-10 16:21:25,376 - INFO - Training model...
+2025-04-10 16:21:26,248 - ERROR - Training failed: Exception encountered when calling Lambda.call().
+
+[1mInput tensor `functional_1/ctc_1/Cast_2:0` enters the loop with shape (1, 1), but has shape (1, None) after one iteration. To allow the shape to vary across iterations, use the `shape_invariants` argument of tf.while_loop to specify a less-specific shape.[0m
+
+Arguments received by Lambda.call():
+  • inputs=['tf.Tensor(shape=(None, 1), dtype=int64)', 'tf.Tensor(shape=(None, 25, 27), dtype=float32)', 'tf.Tensor(shape=(None, 1), dtype=int64)', 'tf.Tensor(shape=(None, 1), dtype=int64)']
+  • mask=['None', 'None', 'None', 'None']
+  • training=True
+Traceback (most recent call last):
+  File "C:\Users\niksh\Desktop\DA5402-Assign-8\src\train.py", line 39, in train_model
+    history = model.fit(train_data, validation_data=val_data, epochs=20)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\niksh\Desktop\DA5402-Assign-8\venv\Lib\site-packages\keras\src\utils\traceback_utils.py", line 122, in error_handler
+    raise e.with_traceback(filtered_tb) from None
+  File "C:\Users\niksh\Desktop\DA5402-Assign-8\src\utils.py", line 62, in <lambda>
+    loss_out = layers.Lambda(lambda args: ctc_batch_cost(*args), name='ctc', output_shape=(1,))(
+                                          ^^^^^^^^^^^^^^^^^^^^^
+ValueError: Exception encountered when calling Lambda.call().
+
+[1mInput tensor `functional_1/ctc_1/Cast_2:0` enters the loop with shape (1, 1), but has shape (1, None) after one iteration. To allow the shape to vary across iterations, use the `shape_invariants` argument of tf.while_loop to specify a less-specific shape.[0m
+
+Arguments received by Lambda.call():
+  • inputs=['tf.Tensor(shape=(None, 1), dtype=int64)', 'tf.Tensor(shape=(None, 25, 27), dtype=float32)', 'tf.Tensor(shape=(None, 1), dtype=int64)', 'tf.Tensor(shape=(None, 1), dtype=int64)']
+  • mask=['None', 'None', 'None', 'None']
+  • training=True

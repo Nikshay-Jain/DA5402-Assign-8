@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/0/474c7eeffc354469a9a0c3fa182556d4/artifacts
+end_time: 1744281455608
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 474c7eeffc354469a9a0c3fa182556d4
+run_name: upbeat-loon-205
+run_uuid: 474c7eeffc354469a9a0c3fa182556d4
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1744281449930
+status: 4
+tags: []
+user_id: niksh

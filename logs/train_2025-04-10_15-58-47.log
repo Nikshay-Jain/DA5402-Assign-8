@@ -1,0 +1,20 @@
+2025-04-10 15:58:48,154 - INFO - Preparing data...
+2025-04-10 15:58:49,123 - WARNING - Variant folder C:\Users\niksh\tensorflow_datasets\emnist\letters\3.1.0 has no dataset_info.json
+2025-04-10 15:58:49,123 - INFO - Generating dataset emnist (C:\Users\niksh\tensorflow_datasets\emnist\letters\3.1.0)
+2025-04-10 15:58:50,263 - INFO - Downloading https://biometrics.nist.gov/cs_links/EMNIST/gzip.zip into C:\Users\niksh\tensorflow_datasets\downloads\emnist\biometrics.nist.gov_cs_links_EMNIST_gzipggz9phjI2Qk7f_iLO6IIzIOZdZRPpnH3k41orh0yFZo.zip.tmp.c9260abcbda8446ead9b6a4ae72ad7b9...
+2025-04-10 16:05:03,690 - INFO - Done writing C:\Users\niksh\tensorflow_datasets\emnist\letters\incomplete.67NIG0_3.1.0\emnist-train.tfrecord*. Number of examples: 88800 (shards: [88800])
+2025-04-10 16:05:10,050 - INFO - Done writing C:\Users\niksh\tensorflow_datasets\emnist\letters\incomplete.67NIG0_3.1.0\emnist-test.tfrecord*. Number of examples: 14800 (shards: [14800])
+2025-04-10 16:05:10,107 - INFO - Creating a tf.data.Dataset reading 1 files located in folders: C:\Users\niksh\tensorflow_datasets\emnist\letters\3.1.0.
+2025-04-10 16:05:10,526 - INFO - Constructing tf.data.Dataset emnist for split train, from C:\Users\niksh\tensorflow_datasets\emnist\letters\3.1.0
+2025-04-10 16:05:11,958 - INFO - Building model...
+2025-04-10 16:05:12,305 - INFO - Training model...
+2025-04-10 16:05:12,488 - ERROR - Training failed: Input 0 of layer "handwriting_crnn" is incompatible with the layer: expected shape=(None, 28, 28, 1), found shape=(None, 1, 28, 28)
+Traceback (most recent call last):
+  File "C:\Users\niksh\Desktop\DA5402-Assign-8\src\train.py", line 39, in train_model
+    history = model.fit(train_data, validation_data=val_data, epochs=20)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\niksh\Desktop\DA5402-Assign-8\venv\Lib\site-packages\keras\src\utils\traceback_utils.py", line 122, in error_handler
+    raise e.with_traceback(filtered_tb) from None
+  File "C:\Users\niksh\Desktop\DA5402-Assign-8\venv\Lib\site-packages\keras\src\layers\input_spec.py", line 245, in assert_input_compatibility
+    raise ValueError(
+ValueError: Input 0 of layer "handwriting_crnn" is incompatible with the layer: expected shape=(None, 28, 28, 1), found shape=(None, 1, 28, 28)

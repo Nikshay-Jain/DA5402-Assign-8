@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/0/1cd8e11b97234e5eab0d7695fadda36a/artifacts
+end_time: 1744281863201
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 1cd8e11b97234e5eab0d7695fadda36a
+run_name: burly-fawn-14
+run_uuid: 1cd8e11b97234e5eab0d7695fadda36a
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1744281860082
+status: 4
+tags: []
+user_id: niksh

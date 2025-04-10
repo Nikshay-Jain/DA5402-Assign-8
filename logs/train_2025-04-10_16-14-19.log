@@ -1,0 +1,11 @@
+2025-04-10 16:14:20,289 - INFO - Preparing data...
+2025-04-10 16:14:22,383 - INFO - Load dataset info from C:\Users\niksh\tensorflow_datasets\emnist\letters\3.1.0
+2025-04-10 16:14:22,402 - INFO - Creating a tf.data.Dataset reading 1 files located in folders: C:\Users\niksh\tensorflow_datasets\emnist\letters\3.1.0.
+2025-04-10 16:14:22,631 - INFO - Constructing tf.data.Dataset emnist for split train, from C:\Users\niksh\tensorflow_datasets\emnist\letters\3.1.0
+2025-04-10 16:14:22,826 - INFO - Building model...
+2025-04-10 16:14:23,189 - ERROR - Training failed: 'tuple' object has no attribute 'compile'
+Traceback (most recent call last):
+  File "C:\Users\niksh\Desktop\DA5402-Assign-8\src\train.py", line 36, in train_model
+    model.compile(optimizer=keras.optimizers.Adam(), loss=keras.backend.ctc_batch_cost)
+    ^^^^^^^^^^^^^
+AttributeError: 'tuple' object has no attribute 'compile'

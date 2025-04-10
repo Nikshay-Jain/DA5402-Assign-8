@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/0/ccd05cd7ec8249279502565afe1eaf83/artifacts
+end_time: 1744282286255
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: ccd05cd7ec8249279502565afe1eaf83
+run_name: blushing-snipe-303
+run_uuid: ccd05cd7ec8249279502565afe1eaf83
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1744282282736
+status: 4
+tags: []
+user_id: niksh

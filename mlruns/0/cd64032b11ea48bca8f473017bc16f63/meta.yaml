@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/0/cd64032b11ea48bca8f473017bc16f63/artifacts
+end_time: 1744281936345
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: cd64032b11ea48bca8f473017bc16f63
+run_name: languid-worm-895
+run_uuid: cd64032b11ea48bca8f473017bc16f63
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1744281933588
+status: 4
+tags: []
+user_id: niksh

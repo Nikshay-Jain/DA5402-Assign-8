@@ -1,0 +1,9 @@
+2025-04-10 15:57:29,322 - INFO - Preparing data...
+2025-04-10 15:57:29,322 - ERROR - Training failed: No module named 'tensorflow_datasets'
+Traceback (most recent call last):
+  File "C:\Users\niksh\Desktop\DA5402-Assign-8\src\train.py", line 31, in train_model
+    (train_data, val_data, test_data), char_to_num, num_to_char = get_data(seed=split_seed)
+                                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\niksh\Desktop\DA5402-Assign-8\src\utils.py", line 20, in get_data
+    import tensorflow_datasets as tfds
+ModuleNotFoundError: No module named 'tensorflow_datasets'

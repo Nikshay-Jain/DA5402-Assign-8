@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/0/4c731f3bb95947309c050d1b63d8663a/artifacts
+end_time: 1744280850945
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 4c731f3bb95947309c050d1b63d8663a
+run_name: mysterious-chimp-681
+run_uuid: 4c731f3bb95947309c050d1b63d8663a
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1744280840462
+status: 4
+tags: []
+user_id: niksh

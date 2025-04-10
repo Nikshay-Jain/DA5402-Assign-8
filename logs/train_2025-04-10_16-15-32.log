@@ -1,0 +1,16 @@
+2025-04-10 16:15:33,730 - INFO - Preparing data...
+2025-04-10 16:15:35,465 - INFO - Load dataset info from C:\Users\niksh\tensorflow_datasets\emnist\letters\3.1.0
+2025-04-10 16:15:35,477 - INFO - Creating a tf.data.Dataset reading 1 files located in folders: C:\Users\niksh\tensorflow_datasets\emnist\letters\3.1.0.
+2025-04-10 16:15:35,650 - INFO - Constructing tf.data.Dataset emnist for split train, from C:\Users\niksh\tensorflow_datasets\emnist\letters\3.1.0
+2025-04-10 16:15:35,838 - INFO - Building model...
+2025-04-10 16:15:36,142 - INFO - Training model...
+2025-04-10 16:15:36,341 - ERROR - Training failed: Missing data for input "input_length". You passed a data dictionary with keys ['image', 'label']. Expected the following keys: ['image', 'label', 'input_length', 'label_length']
+Traceback (most recent call last):
+  File "C:\Users\niksh\Desktop\DA5402-Assign-8\src\train.py", line 39, in train_model
+    history = model.fit(train_data, validation_data=val_data, epochs=20)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\niksh\Desktop\DA5402-Assign-8\venv\Lib\site-packages\keras\src\utils\traceback_utils.py", line 122, in error_handler
+    raise e.with_traceback(filtered_tb) from None
+  File "C:\Users\niksh\Desktop\DA5402-Assign-8\venv\Lib\site-packages\keras\src\layers\input_spec.py", line 149, in assert_input_compatibility
+    raise ValueError(
+ValueError: Missing data for input "input_length". You passed a data dictionary with keys ['image', 'label']. Expected the following keys: ['image', 'label', 'input_length', 'label_length']
