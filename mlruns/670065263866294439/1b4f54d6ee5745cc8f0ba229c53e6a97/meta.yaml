@@ -1,0 +1,15 @@
+artifact_uri: file:///C:/Users/niksh/Desktop/DA5402-Assign-8/mlruns/670065263866294439/1b4f54d6ee5745cc8f0ba229c53e6a97/artifacts
+end_time: 1744292340335
+entry_point_name: ''
+experiment_id: '670065263866294439'
+lifecycle_stage: active
+run_id: 1b4f54d6ee5745cc8f0ba229c53e6a97
+run_name: aged-fish-231
+run_uuid: 1b4f54d6ee5745cc8f0ba229c53e6a97
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1744292327791
+status: 4
+tags: []
+user_id: niksh

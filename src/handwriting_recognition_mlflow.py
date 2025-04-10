@@ -326,11 +326,11 @@ def main(train_size=0.8, val_size=0.1, test_size=0.1):
                 origin="https://git.io/J0fjL",
                 extract=True,
                 cache_dir=".",
-                cache_subdir="datasets",
+                cache_subdir="data",
             )
 
             # Find the directory containing the dataset
-            base_dir = "datasets"
+            base_dir = "data"
             extracted_dir = os.path.join(base_dir, "IAM_Words_extracted", "IAM_Words")
             
             # Find the words.txt file

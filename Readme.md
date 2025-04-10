@@ -1,4 +1,5 @@
-# Handwriting Recognition with MLflow
+# DA5402 Assign 8
+## Nikshay Jain
 
 This project implements a handwriting recognition system using TensorFlow/Keras and MLflow for experiment tracking and model deployment. The implementation is based on the Keras example: https://keras.io/examples/vision/handwriting_recognition/
 
