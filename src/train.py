@@ -10,6 +10,8 @@ from keras import layers
 from keras import ops # Keras 3 operations module
 from keras.layers import StringLookup
 from keras.utils import set_random_seed
+from tensorflow.keras.backend import ctc_batch_cost
+
 import mlflow
 import mlflow.keras # Or mlflow.tensorflow
 from sklearn.model_selection import train_test_split # Used for splitting indices if needed
@@ -138,45 +140,74 @@ def distortion_free_resize(image, img_size):
     return image
 
 
-def encode_single_sample(img_path, label, img_height, img_width, char_to_num):
+def encode_single_sample(img_path, label, img_height, img_width, char_to_num, max_label_length):
     """Encodes a single sample: read image, process, vectorize label."""
-    # 1. Read image
     try:
+        # Load and preprocess image
         img = tf.io.read_file(img_path)
-        img = tf.io.decode_png(img, channels=1) # Decode PNG, ensure grayscale (1 channel)
-        img = tf.image.convert_image_dtype(img, tf.float32) # Convert to float for processing
+        img = tf.io.decode_png(img, channels=1)  # Ensure grayscale
+        img = distortion_free_resize(img, (img_width, img_height))
+        img = tf.cast(img, tf.float32) / 255.0  # Normalize image
+
+        # Process and encode label
+        label_tensor = tf.strings.unicode_split(label, 'UTF-8')
+        label_encoded = char_to_num(label_tensor)
+        
+        # Pad or truncate label to ensure consistent length
+        label_encoded = tf.pad(label_encoded, [[0, max_label_length - tf.shape(label_encoded)[0]]], constant_values=-1)  # Use -1 for padding
+        label_encoded = label_encoded[:max_label_length]  # Truncate if longer than max_label_length
+
+        return {
+            "image": img,
+            "label": label_encoded,
+            "valid": tf.constant(True)
+        }
     except Exception as e:
-         logger.error(f"Failed to read or decode image: {img_path}. Error: {e}")
-         # Return dummy data or raise error? Depends on how dataset pipeline handles errors
-         return None # Or handle appropriately in tf.data pipeline
-
-    # 2. Resize and normalize
-    img = distortion_free_resize(img, (img_width, img_height)) # Note: Keras example seems to swap w/h here, check carefully
-    img = ops.transpose(img, axes=[1, 0, 2]) # Transpose H, W -> W, H
-
-    # 3. Map label characters to numbers
-    # Ensure label is treated as a UTF-8 string tensor for StringLookup
-    label_tensor = tf.strings.unicode_split(label, 'UTF-8')
-    label_encoded = char_to_num(label_tensor)
-    label_encoded = ops.cast(label_encoded, dtype="int64") # Ensure int64 for CTC loss later
-
-    return {"image": img, "label": label_encoded}
-
+        logger.error(f"Failed to process sample: {img_path}. Error: {e}")
+        return {
+            "image": tf.zeros((img_width, img_height, 1), dtype=tf.float32),
+            "label": tf.constant([], dtype=tf.int64),
+            "valid": tf.constant(False)
+        }
 
 def prepare_dataset(image_paths, labels, batch_size, img_height, img_width, char_to_num):
-    """Creates a tf.data.Dataset for training/validation."""
     AUTOTUNE = tf.data.AUTOTUNE
+    
     dataset = tf.data.Dataset.from_tensor_slices((image_paths, labels))
-    dataset = (
-        dataset.map(
-            lambda x, y: encode_single_sample(x, y, img_height, img_width, char_to_num),
-            num_parallel_calls=AUTOTUNE
-        )
-        .batch(batch_size)
-        .prefetch(buffer_size=AUTOTUNE)
+    
+    dataset = dataset.map(
+        lambda x, y: encode_single_sample(x, y, img_height, img_width, char_to_num),
+        num_parallel_calls=AUTOTUNE
     )
+    
+    # Filter invalid samples
+    dataset = dataset.filter(lambda sample: sample["valid"])
+    
+    # Format data for the CTC model which expects TWO inputs and a dummy output
+    dataset = dataset.map(
+        lambda sample: (
+            # First element: dictionary with both inputs needed by the model
+            {
+                "image": sample["image"], 
+                "label": sample["label"]
+            },
+            # Second element: dummy output (model uses CTC loss internally)
+            sample["label"]  # Dummy target tensor (not actually used)
+        ),
+        num_parallel_calls=AUTOTUNE
+    )
+    
+    # Batch and prefetch with padding for variable-length labels
+    dataset = dataset.batch(
+        batch_size,
+        padded_shapes=(
+            {"image": [img_width, img_height, 1], "label": [None]},  # Pad labels to max length in batch
+            [None]  # Pad dummy outputs (same as labels)
+        )
+    )
+    dataset = dataset.prefetch(buffer_size=AUTOTUNE)
+    
     return dataset
-
 
 def load_and_preprocess_data(base_path, batch_size, img_height, img_width, train_ratio=0.8, val_ratio=0.1, test_ratio=0.1, random_seed=42):
     """Loads dataset, cleans labels, splits data, prepares datasets."""
@@ -286,7 +317,7 @@ class CTCLayer(layers.Layer):
     """
     def __init__(self, name=None, **kwargs):
         super().__init__(name=name, **kwargs)
-        self.loss_fn = keras.backend.ctc_batch_cost # Reference the backend function
+        self.loss_fn = ctc_batch_cost    # Reference the backend function
 
     def call(self, y_true, y_pred):
         # The loss calculation is the main purpose here when added to the model graph.
@@ -325,7 +356,8 @@ def build_model(img_width, img_height, vocab_size, max_len):
     logger.info(f"Building model with Img W={img_width}, H={img_height}, Vocab Size={vocab_size}, Max Len={max_len}")
 
     input_img = keras.Input(shape=(img_width, img_height, 1), name="image", dtype="float32")
-    labels = layers.Input(name="label", shape=(None,), dtype="int64") #CTC loss expects int64 usually
+    labels = layers.Input(name="label", shape=(None,), dtype="int64")
+
 
     # CNN Layers (Convolutional Block)
     x = layers.Conv2D(
@@ -374,7 +406,9 @@ def build_model(img_width, img_height, vocab_size, max_len):
     # This model is used for inference and in the EditDistanceCallback.
     # It takes only the image as input and outputs the softmax predictions.
     prediction_model = keras.models.Model(
-        model.get_layer(name="image").input, model.get_layer(name="dense2").output, name="handwriting_recognizer_predict"
+        inputs=model.input[0],                           # use the image input only
+        outputs=model.get_layer(name="dense2").output, 
+        name="handwriting_recognizer_predict"
     )
 
     logger.info("Model built and compiled successfully.")

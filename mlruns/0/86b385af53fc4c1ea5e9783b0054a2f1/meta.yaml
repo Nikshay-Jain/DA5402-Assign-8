@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/0/86b385af53fc4c1ea5e9783b0054a2f1/artifacts
+end_time: 1744288253082
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 86b385af53fc4c1ea5e9783b0054a2f1
+run_name: split_80_10_10
+run_uuid: 86b385af53fc4c1ea5e9783b0054a2f1
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1744288246861
+status: 4
+tags: []
+user_id: niksh
