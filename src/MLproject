@@ -1,0 +1,9 @@
+name: handwriting-recognition
+
+conda_env: conda.yaml
+
+entry_points:
+  main:
+    parameters:
+      image_path: {type: path, default: "test_examples/test_example_0.png"}
+    command: "python inference.py -P {image_path}"

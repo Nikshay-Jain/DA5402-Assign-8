@@ -1,0 +1,15 @@
+artifact_uri: file:///C:/Users/niksh/Desktop/DA5402-Assign-8/mlruns/670065263866294439/eb43df93a2a24fecb3a93b53fb5a9210/artifacts
+end_time: 1744290790539
+entry_point_name: ''
+experiment_id: '670065263866294439'
+lifecycle_stage: active
+run_id: eb43df93a2a24fecb3a93b53fb5a9210
+run_name: lyrical-duck-638
+run_uuid: eb43df93a2a24fecb3a93b53fb5a9210
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1744290777636
+status: 4
+tags: []
+user_id: niksh

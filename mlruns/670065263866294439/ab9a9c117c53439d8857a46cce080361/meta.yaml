@@ -1,0 +1,15 @@
+artifact_uri: file:///C:/Users/niksh/Desktop/DA5402-Assign-8/mlruns/670065263866294439/ab9a9c117c53439d8857a46cce080361/artifacts
+end_time: 1744290083662
+entry_point_name: ''
+experiment_id: '670065263866294439'
+lifecycle_stage: active
+run_id: ab9a9c117c53439d8857a46cce080361
+run_name: adaptable-rook-279
+run_uuid: ab9a9c117c53439d8857a46cce080361
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1744290048829
+status: 4
+tags: []
+user_id: niksh

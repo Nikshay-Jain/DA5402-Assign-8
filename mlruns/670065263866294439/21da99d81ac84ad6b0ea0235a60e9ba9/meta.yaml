@@ -1,0 +1,15 @@
+artifact_uri: file:///C:/Users/niksh/Desktop/DA5402-Assign-8/mlruns/670065263866294439/21da99d81ac84ad6b0ea0235a60e9ba9/artifacts
+end_time: 1744291310823
+entry_point_name: ''
+experiment_id: '670065263866294439'
+lifecycle_stage: active
+run_id: 21da99d81ac84ad6b0ea0235a60e9ba9
+run_name: chill-rat-320
+run_uuid: 21da99d81ac84ad6b0ea0235a60e9ba9
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1744291296212
+status: 4
+tags: []
+user_id: niksh

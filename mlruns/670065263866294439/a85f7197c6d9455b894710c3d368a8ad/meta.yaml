@@ -1,0 +1,15 @@
+artifact_uri: file:///C:/Users/niksh/Desktop/DA5402-Assign-8/mlruns/670065263866294439/a85f7197c6d9455b894710c3d368a8ad/artifacts
+end_time: 1744289375844
+entry_point_name: ''
+experiment_id: '670065263866294439'
+lifecycle_stage: active
+run_id: a85f7197c6d9455b894710c3d368a8ad
+run_name: burly-lark-984
+run_uuid: a85f7197c6d9455b894710c3d368a8ad
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1744289342385
+status: 4
+tags: []
+user_id: niksh

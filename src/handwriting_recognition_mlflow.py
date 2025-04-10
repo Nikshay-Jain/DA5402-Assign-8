@@ -102,12 +102,26 @@ def preprocess_image(image_path, img_size=(img_width, img_height)):
 
 
 def vectorize_label(label):
-    """Convert label to a vector."""
-    label = char_to_num(tf.strings.lower(label))
-    length = tf.shape(label)[0]
-    pad_amount = max_length - length
-    label = tf.pad(label, paddings=[[0, pad_amount]], constant_values=0)
-    return label
+    """Convert label to a vector with empty label handling."""
+    # Convert to lowercase and split into characters
+    label = tf.strings.lower(label)
+    label_chars = tf.strings.unicode_split(label, 'UTF-8')
+    
+    # Convert to numerical tokens
+    label_encoded = char_to_num(label_chars)
+    
+    # Handle empty labels
+    non_empty = tf.greater(tf.size(label_encoded), 0)
+    
+    # Pad/truncate with safety checks
+    label_encoded = tf.cond(
+        non_empty,
+        lambda: tf.pad(label_encoded, [[0, max_length - tf.shape(label_encoded)[0]]], constant_values=0),
+        lambda: tf.fill([max_length], 0)  # Create dummy tensor for empty labels
+    )
+    
+    return label_encoded[:max_length]  # Ensure fixed length
+
 
 
 def process_images_labels(image_path, label):
@@ -246,6 +260,48 @@ class EditDistanceCallback(keras.callbacks.Callback):
         return
 
 
+def find_words_file(base_dir):
+    """Find the words.txt file in the dataset directory structure."""
+    # Try different possible locations
+    possible_paths = [
+        os.path.join(base_dir, "IAM_Words", "words", "words.txt"),
+        os.path.join(base_dir, "IAM_Words_extracted", "IAM_Words", "words", "words.txt"),
+        os.path.join(base_dir, "IAM_Words_extracted", "IAM_Words", "words.txt")
+    ]
+    
+    for path in possible_paths:
+        if os.path.exists(path):
+            logger.info(f"Found words.txt at: {path}")
+            return path
+    
+    # If we can't find it, search for it
+    logger.info("Searching for words.txt file...")
+    for root, dirs, files in os.walk(base_dir):
+        if "words.txt" in files:
+            path = os.path.join(root, "words.txt")
+            logger.info(f"Found words.txt at: {path}")
+            return path
+    
+    raise FileNotFoundError("Could not find words.txt file in the dataset directory")
+
+
+def find_words_directory(base_dir, words_file_path):
+    """Find the directory containing word images."""
+    # The words directory should be in the same directory as words.txt or in a subdirectory
+    words_dir = os.path.dirname(words_file_path)
+    
+    # Check if this directory contains PNG files, if yes, then use it
+    if any(file.endswith('.png') for file in os.listdir(words_dir)):
+        return words_dir
+    
+    # Otherwise, check for a subdirectory that contains PNG files
+    for root, dirs, files in os.walk(os.path.dirname(words_file_path)):
+        if any(file.endswith('.png') for file in files):
+            return root
+    
+    raise FileNotFoundError("Could not find directory with word images")
+
+
 def main(train_size=0.8, val_size=0.1, test_size=0.1):
     """Main function to train the model."""
     try:
@@ -273,11 +329,31 @@ def main(train_size=0.8, val_size=0.1, test_size=0.1):
                 cache_subdir="datasets",
             )
 
-            data_dir = os.path.join(os.path.dirname(words_ds), "IAM_Words", "words")
+            # Find the directory containing the dataset
+            base_dir = "datasets"
+            extracted_dir = os.path.join(base_dir, "IAM_Words_extracted", "IAM_Words")
+            
+            # Find the words.txt file
+            words_txt_path = os.path.join(extracted_dir, "words.txt")
+            
+            if not os.path.exists(words_txt_path):
+                raise FileNotFoundError(f"Could not find words.txt at {words_txt_path}")
+            
+            logger.info(f"Found words.txt at: {words_txt_path}")
+            
+            # Find the words directory containing images
+            words_dir = os.path.join(extracted_dir, "words")
+            
+            if not os.path.exists(words_dir):
+                raise FileNotFoundError(f"Words directory not found at {words_dir}")
+            
+            logger.info(f"Found words directory at: {words_dir}")
+            
+            # Read the words.txt file and process the dataset
             images = []
             labels = []
             
-            words_list = open(f"{data_dir}/words.txt", "r").readlines()
+            words_list = open(words_txt_path, "r").readlines()
             for line in words_list:
                 if line.startswith("#"):
                     continue
@@ -288,11 +364,26 @@ def main(train_size=0.8, val_size=0.1, test_size=0.1):
                     image_text = line_split[8].lower()
                     
                     # Filter out samples with characters not in vocabulary
-                    if all(char in "abcdefghijklmnopqrstuvwxyz0123456789" for char in image_text):
-                        image_path = os.path.join(data_dir, image_name + ".png")
-                        if os.path.exists(image_path):
-                            images.append(image_path)
-                            labels.append(image_text)
+                    if (len(image_text) > 0 and 
+                        all(char in "abcdefghijklmnopqrstuvwxyz0123456789" for char in image_text)):
+                        # For the IAM dataset, the image path follows this pattern:
+                        # a01-000u-00-00 -> words/a01/a01-000u/a01-000u-00-00.png
+                        parts = image_name.split("-")
+                        if len(parts) >= 2:
+                            writer_id = parts[0]
+                            form_id = f"{writer_id}-{parts[1]}"
+                            image_path = os.path.join(words_dir, writer_id, form_id, f"{image_name}.png")
+                            
+                            if os.path.exists(image_path):
+                                images.append(image_path)
+                                labels.append(image_text)
+                            else:
+                                logger.debug(f"Image not found: {image_path}")
+            
+            logger.info(f"Found {len(images)} valid images with labels")
+            
+            if len(images) == 0:
+                raise ValueError("No valid images found. Check the dataset structure.")
             
             # Split the data
             (train_images, train_labels), (val_images, val_labels), (test_images, test_labels) = \
@@ -372,6 +463,9 @@ def main(train_size=0.8, val_size=0.1, test_size=0.1):
             edit_distance_plot_path = "edit_distance_plot.png"
             plt.savefig(edit_distance_plot_path)
             mlflow.log_artifact(edit_distance_plot_path)
+            
+            # Create directory for models if it doesn't exist
+            os.makedirs("models", exist_ok=True)
             
             # Save and log the model
             logger.info("Saving model...")
