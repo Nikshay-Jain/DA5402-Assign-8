@@ -1,5 +1,5 @@
 artifact_uri: file:///C:/Users/niksh/Desktop/DA5402-Assign-8/mlruns/670065263866294439/3cf69d89db5049979aa5a58335b07944/artifacts
-end_time: null
+end_time: 1744338234506
 entry_point_name: ''
 experiment_id: '670065263866294439'
 lifecycle_stage: active
@@ -10,6 +10,6 @@ source_name: ''
 source_type: 4
 source_version: ''
 start_time: 1744330240727
-status: 1
+status: 3
 tags: []
 user_id: niksh

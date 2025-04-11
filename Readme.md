@@ -1,115 +1,184 @@
-# DA5402 Assign 8
-## Nikshay Jain | MM21B044
+# DA5402 - Assignment 8  
+## Nikshay Jain | MM21B044  
 
-This project implements a handwriting recognition system using TensorFlow/Keras and MLflow for experiment tracking and model deployment. The implementation is based on the Keras example: https://keras.io/examples/vision/handwriting_recognition/
+This project implements a complete pipeline for handwriting recognition using the IAM dataset. The system includes CRNN model training with MLflow tracking, REST API for prediction, and an MLproject setup for seamless deployment.
 
-## Requirements
-- Python 3.8+
-- TensorFlow 2.9+
-- MLflow 2.4+
-- Flask (for API)
-- NumPy, Matplotlib, Pillow
+The base implementation is adapted from the official Keras example:  
+🔗 https://keras.io/examples/vision/handwriting_recognition/
 
-## Project Structure
+---
+
+## Table of Contents
+1. [Project Overview](#project-overview)
+2. [Directory Structure](#directory-structure)
+3. [Setup Instructions](#setup-instructions)
+4. [Usage](#usage)
+   - [Task 1: Model Training with MLflow](#task-1-model-training-with-mlflow)
+   - [Task 2: REST API Server](#task-2-rest-api-server)
+   - [Task 3: MLProject Inference](#task-3-mlproject-inference)
+5. [Results](#results)
+6. [Closing Note](#closing-note)
+
+---
+
+## Project Overview
+
+The system uses a **Convolutional Recurrent Neural Network (CRNN)** to transcribe handwritten text images into strings. The training pipeline includes:
+- Character-level encoding with CTC loss.
+- MLflow logging for all model metrics, artifacts, and configurations.
+- Logging of edit distance and validation plots.
+- REST API for real-time prediction.
+- MLproject definition for portability.
+
+---
+
+## Directory Structure
+
 ```
 DA5402-Assign-8/
-├── Readme.md                      # Documentation for setup, usage, and structure
-├── src/                           # Source code directory
-│   ├── task_1.py                  # Script to train the CRNN model with MLflow experiment tracking
-│   ├── task_2.py                  # REST API server using FastAPI/Flask to serve the trained model
-│   ├── conda.yaml                 # Environment file specific to scripts in src/
-│   └── MLProject                  # Optional MLProject file for local runs from src/
-|
-├── data/                          # Directory for storing datasets (e.g., IAM Handwriting Dataset)
-│   ├── IAM_Words.zip              # Original dataset archive
-│   ├── IAM_Words_extracted/       # Extracted IAM dataset (images, labels)
-│   └── processed/                 # Preprocessed/cleaned data (e.g., TFRecords or .npy)
-|
-├── logs/                          # Logging output from training and evaluation
-│   └── training_log_YYYY-MM-DD_HH-MM-SS.log  # Timestamped log files
-|
-├── plots/                         # Generated visualizations (e.g., loss curves, predictions)
+├── conda.yaml                       # Global conda environment file
+├── Readme.md                        # Project documentation
+├── requirements.txt                 # Python dependencies
+├── .gitignore                       # Git ignore patterns
+│
+├── src/                             # Source code directory
+│   ├── task_1.py                    # Script to train the model with MLflow tracking
+│   ├── task_2.py                    # Flask-based API server for inference
+│   ├── conda.yaml                   # Env file used within src for MLproject
+│   └── MLProject                    # MLproject file for running tasks from src
+│
+├── data/                            # Data directory for raw/extracted datasets
+│   ├── IAM_Words.zip                # Original dataset archive
+│   ├── IAM_Words_extracted/        # Extracted IAM dataset (images & metadata)
+│   └── processed/                   # Preprocessed TF-ready data
+│
+├── logs/                            # Training and evaluation logs
+│   └── training_log_YYYY-MM-DD_HH-MM-SS.log
+│
+├── plots/                           # Visualizations
 │   ├── train_loss_plot.png
 │   ├── val_loss_plot.png
 │   └── sample_predictions.png
-|
-├── mlruns/                        # MLflow-generated folder for experiment tracking
-│   └── [MLflow run metadata and artifacts]
-|
-├── models/                        # Saved trained model artifacts
-│   └── handwriting_model/         # Keras/TensorFlow saved model directory
-|
-├── test_examples/                 # Sample images for testing model inference
+│
+├── mlruns/                          # MLflow logs and artifacts
+│   └── <experiment_id>/...
+│
+├── models/                          # Saved model artifacts
+│   └── handwriting_model/           # TensorFlow SavedModel format
+│
+├── test_examples/                   # Sample images for API and inference testing
 │   ├── test_example_0.png
 │   └── test_example_1.png
-|
-├── inference.py                   # Script to run inference using a saved model (loads images, predicts text)
-├── requirements.txt               # Contains dependencies
-└── .gitignore                     # Patterns to exclude files from version control (e.g., `mlruns/`, `logs/`, `*.zip`)
+│
+├── inference.py                     # Script to test inference using MLproject
+└── MLproject                        # MLflow project definition file
 ```
 
-## Task 1: MLflow Experiment Tracking
+---
 
-The `handwriting_recognition_mlflow.py` script handles the model training with MLflow tracking.
+## Setup Instructions
 
-**Features:**
-- Logging of parameters, metrics, and artifacts
-- Tracking of training and validation losses
-- Tracking of Average Edit Distance per epoch
-- Model versioning and registration in MLflow Registry
-- Visualization of loss and edit distance metrics
-- Training with different train-val-test splits
+### 1. Clone the repository
 
-### Running Task 1
 ```bash
-# Install required packages
-pip install -r requirements.txt
+git clone https://github.com/Nikshay-Jain/DA5402-Assign-8.git
+cd DA5402-Assign-8
+```
 
+### 2. Create a virtual environment (recommended)
+
+```bash
+python -m venv .venv
+source .venv/bin/activate       # On Linux/Mac
+.\.venv\Scripts\activate        # On Windows
+```
+
+### 3. Install required packages
+
+```bash
+pip install -r requirements.txt
+```
+
+---
+
+## Usage
+
+### Task 1: Model Training with MLflow
+
+This task handles model training, MLflow logging, edit distance metrics, and saving visualizations.
+If the execution fails, you might need to manually unzip some folders in the data directory.
+
+```bash
 # Start MLflow UI
 mlflow ui
+# Visit http://localhost:5000
 
-# In a separate terminal, run the training script
-python src\task_1.py
+# Run the training script
+python src/task_1.py
 ```
 
-The script will run 3 training sessions with different data splits and log the results to MLflow.
+- Logs training/validation loss & mean edit distance.
+- Saves the best model under `models/handwriting_model/`.
+- Saves plots to `plots/`.
+- Logs metadata in `mlruns/`.
 
-## Task 2: MLflow API for Handwriting Recognition
+---
 
-The `task_2.py` script implements a Flask-based REST API that serves the handwriting recognition model.
+### Task 2: REST API Server
 
-### Running Task 2
+The script `task_2.py` spins up a Flask server for real-time handwriting prediction.
+
 ```bash
-# Start the API server
-python src\task_2.py
+# Start the Flask API server
+python src/task_2.py
 ```
 
-You can test the API using curl or Postman:
-
+#### Example Usage via curl:
 ```bash
-# Using curl with a file
+# Upload image file
 curl -X POST -F "image=@test_examples/test_example_0.png" http://localhost:5000/predict
-
-# Using curl with base64 encoded image
-curl -X POST -F "image=$(base64 -w 0 test_examples/test_example_0.png)" http://localhost:5000/predict
 ```
 
-## Task 3: MLproject for Inference
+---
 
-The `MLproject` file and `inference.py` script implement an MLflow project for performing inference on handwritten images.
+### Task 3: MLproject Inference
 
-### Running Task 3
+The project is also defined as a portable MLproject, allowing inference to be run via MLflow CLI.
+
 ```bash
-# Run the MLproject with a specified image
+# Predict a given image
 mlflow run . -P image_path=test_examples/test_example_0.png
 
-# Or use the default image
+# Or default
 mlflow run .
 ```
 
-## Visualizing Results
+---
 
-To view the experiment tracking results and plots:
+## Results
 
-1. Start the MLflow UI: `mlflow ui`
-2. Open your web browser to `http://localhost:5000`
+### Sample Metrics (from MLflow logs)
+| Model | Mean Edit Distance |
+|-------|--------------------|
+| Run 1 | 0.67               |
+| Run 2 | 0.50               |
+| Run 3 | 0.48               |
+
+### Saved Artifacts
+- Plots (Loss Curves, Predictions): `plots/`
+- Logs: `logs/training_log_*.log`
+- Model: `models/handwriting_model/`
+- MLflow: `mlruns/`
+
+---
+
+## Closing Note
+
+To debug or explore training progress:
+- Refer to `logs/` for step-wise debug logs.
+- Use `mlflow ui` for complete experiment dashboards.
+- Edit and rerun `task_1.py` with modified split parameters for more insights.
+
+For deployment or testing, the REST API or `inference.py` under MLproject covers all scenarios.
+
+---

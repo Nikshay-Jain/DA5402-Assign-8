@@ -1,0 +1,20 @@
+artifact_path: handwriting_model
+flavors:
+  python_function:
+    data: data
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.tensorflow
+    python_version: 3.8.0
+  tensorflow:
+    code: null
+    data: data
+    keras_version: 2.13.0
+    model_type: keras
+    save_format: tf
+mlflow_version: 2.17.2
+model_size_bytes: 5900794
+model_uuid: ccacaf2f79d64bcca904fdd1a7ae35c8
+run_id: 3cf69d89db5049979aa5a58335b07944
+utc_time_created: '2025-04-11 02:22:56.969477'
