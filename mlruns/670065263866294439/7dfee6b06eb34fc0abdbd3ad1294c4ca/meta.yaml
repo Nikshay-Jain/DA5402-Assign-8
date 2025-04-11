@@ -1,0 +1,15 @@
+artifact_uri: file:///C:/Users/niksh/Desktop/DA5402-Assign-8/mlruns/670065263866294439/7dfee6b06eb34fc0abdbd3ad1294c4ca/artifacts
+end_time: 1744316070331
+entry_point_name: ''
+experiment_id: '670065263866294439'
+lifecycle_stage: active
+run_id: 7dfee6b06eb34fc0abdbd3ad1294c4ca
+run_name: nervous-snake-469
+run_uuid: 7dfee6b06eb34fc0abdbd3ad1294c4ca
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1744315815504
+status: 4
+tags: []
+user_id: niksh

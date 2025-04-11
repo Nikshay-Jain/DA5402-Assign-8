@@ -1,0 +1,15 @@
+artifact_uri: file:///C:/Users/niksh/Desktop/DA5402-Assign-8/mlruns/670065263866294439/3cf69d89db5049979aa5a58335b07944/artifacts
+end_time: null
+entry_point_name: ''
+experiment_id: '670065263866294439'
+lifecycle_stage: active
+run_id: 3cf69d89db5049979aa5a58335b07944
+run_name: luminous-bug-993
+run_uuid: 3cf69d89db5049979aa5a58335b07944
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1744330240727
+status: 1
+tags: []
+user_id: niksh

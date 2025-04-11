@@ -1,0 +1,15 @@
+artifact_uri: file:///C:/Users/niksh/Desktop/DA5402-Assign-8/mlruns/670065263866294439/63a34b9fc5e54bf28c227a884255365e/artifacts
+end_time: 1744324876124
+entry_point_name: ''
+experiment_id: '670065263866294439'
+lifecycle_stage: active
+run_id: 63a34b9fc5e54bf28c227a884255365e
+run_name: enchanting-shark-537
+run_uuid: 63a34b9fc5e54bf28c227a884255365e
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1744322354140
+status: 3
+tags: []
+user_id: niksh

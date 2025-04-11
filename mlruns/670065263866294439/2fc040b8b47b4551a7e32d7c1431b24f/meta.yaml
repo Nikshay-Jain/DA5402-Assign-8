@@ -1,0 +1,15 @@
+artifact_uri: file:///C:/Users/niksh/Desktop/DA5402-Assign-8/mlruns/670065263866294439/2fc040b8b47b4551a7e32d7c1431b24f/artifacts
+end_time: 1744330236885
+entry_point_name: ''
+experiment_id: '670065263866294439'
+lifecycle_stage: active
+run_id: 2fc040b8b47b4551a7e32d7c1431b24f
+run_name: righteous-cat-957
+run_uuid: 2fc040b8b47b4551a7e32d7c1431b24f
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1744324878181
+status: 3
+tags: []
+user_id: niksh

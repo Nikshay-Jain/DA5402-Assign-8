@@ -1,0 +1,15 @@
+artifact_uri: file:///C:/Users/niksh/Desktop/DA5402-Assign-8/mlruns/670065263866294439/6c55e593358e4bc7aa3152c87fad6fad/artifacts
+end_time: 1744320668370
+entry_point_name: ''
+experiment_id: '670065263866294439'
+lifecycle_stage: active
+run_id: 6c55e593358e4bc7aa3152c87fad6fad
+run_name: placid-auk-541
+run_uuid: 6c55e593358e4bc7aa3152c87fad6fad
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1744319392827
+status: 4
+tags: []
+user_id: niksh

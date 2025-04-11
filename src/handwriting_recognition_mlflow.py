@@ -1,17 +1,29 @@
-import os
 import numpy as np
 import matplotlib.pyplot as plt
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
-import mlflow
 import mlflow.tensorflow
-import logging
-import random
-import datetime
+import os, random, logging, datetime, mlflow
 
-# Set up logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+# Ensure logs directory exists
+logs_dir = "logs"
+os.makedirs(logs_dir, exist_ok=True)
+
+# Create a log file name with a timestamp
+log_filename = os.path.join(
+    logs_dir, f"train_{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.log"
+)
+
+# Set up logging to file and console
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    handlers=[
+        logging.FileHandler(log_filename),
+        logging.StreamHandler()
+    ]
+)
 logger = logging.getLogger(__name__)
 
 # MLflow experiment setup
@@ -91,15 +103,30 @@ def distortion_free_resize(image, img_size):
     image = tf.image.flip_left_right(image)
     return image
 
-
 def preprocess_image(image_path, img_size=(img_width, img_height)):
-    """Preprocess the images."""
-    image = tf.io.read_file(image_path)
-    image = tf.image.decode_png(image, 1)
+    """Preprocess the images with a check for empty input."""
+    # Read file from disk (returns a string tensor)
+    image_data = tf.io.read_file(image_path)
+    
+    # Check the length of the file's content
+    file_length = tf.strings.length(image_data)
+    
+    # Use tf.cond to check for an empty file.
+    # Both branches must return a tensor of type uint8.
+    image = tf.cond(
+        tf.equal(file_length, 0),
+        # True branch: if empty, return a dummy image tensor of zeros.
+        lambda: tf.zeros((img_size[1], img_size[0], 1), dtype=tf.uint8),
+        # False branch: decode the PNG image.
+        lambda: tf.image.decode_png(image_data, channels=1)
+    )
+    
+    # Resize the image without distortion.
     image = distortion_free_resize(image, img_size)
+    
+    # Cast to float32 and normalize to [0, 1]
     image = tf.cast(image, tf.float32) / 255.0
     return image
-
 
 def vectorize_label(label):
     """Convert label to a vector with empty label handling."""
@@ -110,19 +137,17 @@ def vectorize_label(label):
     # Convert to numerical tokens
     label_encoded = char_to_num(label_chars)
     
-    # Handle empty labels
+    # Handle empty labels: Check if label_encoded contains any elements.
     non_empty = tf.greater(tf.size(label_encoded), 0)
     
-    # Pad/truncate with safety checks
+    # Use tf.cond to decide whether to pad or fill with zeros.
     label_encoded = tf.cond(
         non_empty,
         lambda: tf.pad(label_encoded, [[0, max_length - tf.shape(label_encoded)[0]]], constant_values=0),
-        lambda: tf.fill([max_length], 0)  # Create dummy tensor for empty labels
+        lambda: tf.fill([max_length], tf.constant(0, dtype=tf.int64))  # Ensure int64 output
     )
     
     return label_encoded[:max_length]  # Ensure fixed length
-
-
 
 def process_images_labels(image_path, label):
     """Process images and labels."""
@@ -141,26 +166,24 @@ def prepare_dataset(images, labels):
 
 
 class CTCLayer(layers.Layer):
-    """CTC Layer to compute loss and decoder."""
-    
     def __init__(self, name=None):
         super().__init__(name=name)
         self.loss_fn = keras.backend.ctc_batch_cost
 
     def call(self, y_true, y_pred):
+        # Batch size
         batch_len = tf.cast(tf.shape(y_true)[0], dtype="int64")
+        # Time steps for predictions
         input_length = tf.cast(tf.shape(y_pred)[1], dtype="int64")
-        label_length = tf.cast(tf.shape(y_true)[1], dtype="int64")
-
+        # Compute actual label length: count non-zero tokens along sequence axis.
+        label_length = tf.reduce_sum(tf.cast(tf.not_equal(y_true, 0), dtype="int64"), axis=1, keepdims=True)
+        
+        # Build constant tensors for input_length: one for each sample.
         input_length = input_length * tf.ones(shape=(batch_len, 1), dtype="int64")
-        label_length = label_length * tf.ones(shape=(batch_len, 1), dtype="int64")
-
+        
         loss = self.loss_fn(y_true, y_pred, input_length, label_length)
         self.add_loss(loss)
-
-        # Return decoded sequence for metric calculation
         return y_pred
-
 
 def build_model():
     """Build the model architecture."""
@@ -224,10 +247,11 @@ def decode_batch_predictions(pred):
 
 
 class EditDistanceCallback(keras.callbacks.Callback):
-    """Custom callback to calculate edit distance."""
+    """Custom callback to calculate edit distance using a separate prediction model."""
     
-    def __init__(self, validation_dataset):
+    def __init__(self, prediction_model, validation_dataset):
         super().__init__()
+        self.prediction_model = prediction_model
         self.validation_dataset = validation_dataset
         self.edit_distances = []
         
@@ -237,27 +261,40 @@ class EditDistanceCallback(keras.callbacks.Callback):
             batch_images = batch["image"]
             batch_labels = batch["label"]
             
-            preds = self.model.predict(batch_images)
-            pred_texts = decode_batch_predictions(preds)
+            # Use the prediction model (which takes a single image input)
+            preds = self.prediction_model.predict(batch_images)
             
+            pred_texts = decode_batch_predictions(preds)
             for i in range(len(pred_texts)):
-                label = tf.gather(batch_labels[i], tf.where(tf.not_equal(batch_labels[i], 0)))
-                label = tf.squeeze(label).numpy()
-                label_text = ''.join([num_to_char(c).numpy().decode('utf-8') for c in label])
+                # Extract the ground-truth label for the i-th sample from batch_labels.
+                # Remove padding (assuming padding value is 0) and decode using num_to_char.
+                label_tensor = batch_labels[i]
+                # Filter out padded values.
+                label_nonzero = tf.boolean_mask(label_tensor, tf.not_equal(label_tensor, 0))
+                # Convert numeric tokens to characters.
+                label_chars = num_to_char(label_nonzero)
+                # Join the characters to form a string.
+                label_text = tf.strings.reduce_join(label_chars).numpy().decode("utf-8")
                 
-                edit_distance = tf.edit_distance(
-                    tf.convert_to_tensor([list(pred_texts[i])], dtype=tf.string),
-                    tf.convert_to_tensor([list(label_text)], dtype=tf.string)
-                ).numpy()[0]
+                # Convert predicted text to a SparseTensor.
+                dense_pred = tf.convert_to_tensor([list(pred_texts[i])], dtype=tf.string)
+                sparse_pred = tf.sparse.from_dense(dense_pred)
                 
+                # Convert the ground truth label text to a SparseTensor.
+                dense_label = tf.convert_to_tensor([list(label_text)], dtype=tf.string)
+                sparse_label = tf.sparse.from_dense(dense_label)
+                
+                # Compute edit distance using SparseTensors.
+                edit_distance = tf.edit_distance(sparse_pred, sparse_label).numpy()[0]
                 edit_distances.append(edit_distance)
+
         
         mean_edit_distance = np.mean(edit_distances)
         self.edit_distances.append(mean_edit_distance)
-        logs["val_edit_distance"] = mean_edit_distance
+        if logs is not None:
+            logs["val_edit_distance"] = mean_edit_distance
         mlflow.log_metric("val_edit_distance", mean_edit_distance, step=epoch)
         logger.info(f"Mean edit distance: {mean_edit_distance}")
-        return
 
 
 def find_words_file(base_dir):
@@ -407,8 +444,15 @@ def main(train_size=0.8, val_size=0.1, test_size=0.1):
             model = build_model()
             model.summary()
             
-            # Custom callback for edit distance
-            edit_distance_callback = EditDistanceCallback(validation_dataset)
+            prediction_model = keras.models.Model(
+                inputs=model.get_layer(name="image").input, 
+                outputs=model.get_layer(name="dense2").output,
+                name="handwriting_recognition_prediction"
+            )
+                
+            # Custom callback for edit distance using the prediction model
+            edit_distance_callback = EditDistanceCallback(prediction_model, validation_dataset)
+
             
             # Callbacks
             early_stopping = keras.callbacks.EarlyStopping(
@@ -417,7 +461,7 @@ def main(train_size=0.8, val_size=0.1, test_size=0.1):
             
             # Train the model
             logger.info("Training model...")
-            epochs = 50
+            epochs = 2
             mlflow.log_param("epochs", epochs)
             
             history = model.fit(
@@ -449,7 +493,7 @@ def main(train_size=0.8, val_size=0.1, test_size=0.1):
             plt.ylabel("Loss")
             plt.title("Training and Validation Loss")
             plt.legend()
-            loss_plot_path = "loss_plot.png"
+            loss_plot_path = "plots\loss_plot.png"
             plt.savefig(loss_plot_path)
             mlflow.log_artifact(loss_plot_path)
             
@@ -460,7 +504,7 @@ def main(train_size=0.8, val_size=0.1, test_size=0.1):
             plt.ylabel("Edit Distance")
             plt.title("Average Edit Distance per Epoch")
             plt.legend()
-            edit_distance_plot_path = "edit_distance_plot.png"
+            edit_distance_plot_path = "plots\edit_distance_plot.png"
             plt.savefig(edit_distance_plot_path)
             mlflow.log_artifact(edit_distance_plot_path)
             

@@ -1,0 +1,14 @@
+aliases: []
+creation_timestamp: 1744330236696
+current_stage: None
+description: null
+last_updated_timestamp: 1744330236696
+name: handwriting_recognition_model
+run_id: 2fc040b8b47b4551a7e32d7c1431b24f
+run_link: null
+source: file:///C:/Users/niksh/Desktop/DA5402-Assign-8/mlruns/670065263866294439/2fc040b8b47b4551a7e32d7c1431b24f/artifacts/handwriting_model
+status: READY
+status_message: null
+storage_location: file:///C:/Users/niksh/Desktop/DA5402-Assign-8/mlruns/670065263866294439/2fc040b8b47b4551a7e32d7c1431b24f/artifacts/handwriting_model
+user_id: null
+version: 2

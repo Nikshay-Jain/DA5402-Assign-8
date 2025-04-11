@@ -1,0 +1,15 @@
+artifact_uri: file:///C:/Users/niksh/Desktop/DA5402-Assign-8/mlruns/670065263866294439/72d51e58ff54432287e8277dcbbd49c0/artifacts
+end_time: 1744317060221
+entry_point_name: ''
+experiment_id: '670065263866294439'
+lifecycle_stage: active
+run_id: 72d51e58ff54432287e8277dcbbd49c0
+run_name: charming-fox-537
+run_uuid: 72d51e58ff54432287e8277dcbbd49c0
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1744317017519
+status: 4
+tags: []
+user_id: niksh

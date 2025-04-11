@@ -1,0 +1,15 @@
+artifact_uri: file:///C:/Users/niksh/Desktop/DA5402-Assign-8/mlruns/670065263866294439/eefd95c31b1f4abbb33ff6d62ada42dc/artifacts
+end_time: 1744314576492
+entry_point_name: ''
+experiment_id: '670065263866294439'
+lifecycle_stage: active
+run_id: eefd95c31b1f4abbb33ff6d62ada42dc
+run_name: rambunctious-duck-10
+run_uuid: eefd95c31b1f4abbb33ff6d62ada42dc
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1744314553612
+status: 4
+tags: []
+user_id: niksh

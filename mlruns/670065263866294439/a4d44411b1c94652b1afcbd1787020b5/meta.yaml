@@ -1,0 +1,15 @@
+artifact_uri: file:///C:/Users/niksh/Desktop/DA5402-Assign-8/mlruns/670065263866294439/a4d44411b1c94652b1afcbd1787020b5/artifacts
+end_time: 1744319013924
+entry_point_name: ''
+experiment_id: '670065263866294439'
+lifecycle_stage: active
+run_id: a4d44411b1c94652b1afcbd1787020b5
+run_name: unleashed-chimp-305
+run_uuid: a4d44411b1c94652b1afcbd1787020b5
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1744317262188
+status: 4
+tags: []
+user_id: niksh
